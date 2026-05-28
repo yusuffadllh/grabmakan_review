@@ -35,6 +35,7 @@ export default function App() {
   const [currentView, setCurrentView] = useState<View>('home');
   const [cartCount, setCartCount] = useState(2);
   const [selectedRestaurant, setSelectedRestaurant] = useState<any>(null);
+  const [cartItems, setCartItems] = useState<any[]>([]);
 
 const renderView = () => {
   switch (currentView) {
@@ -46,25 +47,15 @@ const renderView = () => {
         />
       );
 
-    case 'restaurant':
-      return (
-        <RestaurantDetailView
-          onNavigate={setCurrentView}
-          restaurant={selectedRestaurant}
-        />
-      );
+    case 'restaurant': return <RestaurantDetailView onNavigate={setCurrentView} restaurant={selectedRestaurant} cartItems={cartItems} setCartItems={setCartItems} />
 
-    case 'cart':
-      return <CartView onNavigate={setCurrentView} />;
+    case 'cart': return <CartView onNavigate={setCurrentView} cartItems={cartItems} />;
 
-    case 'checkout':
-      return <CheckoutView onNavigate={setCurrentView} />;
+    case 'checkout': return <CheckoutView onNavigate={setCurrentView} />;
 
-    case 'tracking':
-      return <TrackingView onNavigate={setCurrentView} />;
+    case 'tracking': return <TrackingView onNavigate={setCurrentView} />;
 
-    case 'history':
-      return <HistoryView onNavigate={setCurrentView} />;
+    case 'history':return <HistoryView onNavigate={setCurrentView} />;
 
     case 'review':
       return <ReviewView onNavigate={setCurrentView} />;

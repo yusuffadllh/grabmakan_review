@@ -9,15 +9,44 @@ interface AuthViewProps {
 export default function AuthView({ onNavigate }: AuthViewProps) {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [loading, setLoading] = useState(false);
+  const [nama, setNama] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      onNavigate('home');
-    }, 1500);
-  };
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+  setError('');
+  try {
+    const endpoint =
+      mode === 'login'
+        ? 'http://localhost:5000/api/auth/login'
+        : 'http://localhost:5000/api/auth/register';
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        nama,
+        email,
+        password
+      })
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Terjadi kesalahan');
+    }
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    onNavigate('home');
+  } catch (err: any) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex">
@@ -80,9 +109,11 @@ export default function AuthView({ onNavigate }: AuthViewProps) {
                 <label className="block text-sm font-black text-slate-800 mb-2 transition-colors group-focus-within:text-primary">Nama Lengkap</label>
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 transition-colors group-focus-within:text-primary" />
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     required
+                    value={nama}
+                    onChange={(e) => setNama(e.target.value)}
                     placeholder="Masukkan nama Anda"
                     className="w-full bg-surface-container-low border-2 border-transparent focus:border-primary focus:bg-white rounded-2xl py-4 pl-12 pr-6 text-sm font-medium transition-all focus:ring-0"
                   />
@@ -95,8 +126,10 @@ export default function AuthView({ onNavigate }: AuthViewProps) {
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 transition-colors group-focus-within:text-primary" />
                 <input 
-                  type="email" 
+                  type="email"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
                   className="w-full bg-surface-container-low border-2 border-transparent focus:border-primary focus:bg-white rounded-2xl py-4 pl-12 pr-6 text-sm font-medium transition-all focus:ring-0"
                 />
@@ -110,15 +143,21 @@ export default function AuthView({ onNavigate }: AuthViewProps) {
               </div>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 transition-colors group-focus-within:text-primary" />
-                <input 
-                  type="password" 
+                <input
+                  type="password"
                   required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="w-full bg-surface-container-low border-2 border-transparent focus:border-primary focus:bg-white rounded-2xl py-4 pl-12 pr-6 text-sm font-medium transition-all focus:ring-0"
                 />
               </div>
             </div>
-
+              {error && (
+                <div className="bg-red-100 text-red-500 text-sm font-semibold p-4 rounded-2xl">
+                  {error}
+                </div>
+              )}
             <button 
               type="submit"
               disabled={loading}

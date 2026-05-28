@@ -3,9 +3,11 @@ import { View } from '../types';
 
 interface CheckoutViewProps {
   onNavigate: (view: View) => void;
+  cartItems: any[];
+
 }
 
-export default function CheckoutView({ onNavigate }: CheckoutViewProps) {
+export default function CheckoutView({ onNavigate, cartItems }: CheckoutViewProps) {
   return (
     <div className="max-w-[1440px] mx-auto px-4 md:px-8 py-12">
       <h1 className="text-4xl font-black mb-12">Checkout</h1>
